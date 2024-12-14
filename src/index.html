@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>textmode // terminal</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@latest/css/xterm.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@latest/lib/xterm.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@latest/lib/xterm-addon-attach.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@latest/lib/addon-fit.js"></script>
+        <link rel="stylesheet" href="./textmode.css" />
+        <style>
+            body {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            #terminal {
+                flex-grow: 1;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="terminal"></div>
+        <div style="text-align:right">
+            <a href="https://cd5k.net/tau/">&tau;</a>
+        </div>
+        <script type="module">
+            // welcome to the code of textmode term
+            // it is a complete mess
+            // it uses xterm.js (xtermjs.org) for the terminal
+            // and virtualfs (npmjs.org/package/virtualfs) for the fs
+            // please do not look any further as i have hidden little secrets and easter eggs in the files
+            // and it'd be more fun to figure them out on your own, dont you think?
+            window.global = window
+            // import './figlet.js';
+            let user = 2;
+            
+            const commands = {
+                'help': {
+                    aliases: ['?'],
+                    usage: 'help',
+                    description: 'HELP ME HEEELP HEELP HELP ME',
+                    fn: () => {
+                        printf(Object.entries(commands).map(([_, data]) => `${data.usage} - ${data.description}`).join('\n'))
+                    }
+                },
+                'echo': {
+                    aliases: [],
+                    usage: 'echo [text]',
+                    description: 'display a line of text',
+                    fn: (argv) => {
+                        printf(argv.join(' '));
+                    }
+                },
+                'clear': {
+                    aliases: ['cls'],
+                    usage: 'clear',
+                    description: 'clears the screen',
+                    fn: () => {
+                        terminal.clear();
+                    }
+                },
+                
+                // FS STUFF
+                'ls': {
+                    aliases: ['dir'],
+                    usage: 'ls [path]',
+                    description: 'list the files of a directory',
+                    fn: ([dir]) => {
+                        if (!fs.existsSync(dir ?? cwd) || !fs.statSync(dir ?? cwd).isDirectory()) return printf(`ls: cannot access '${dir ?? cwd}': No such file or directory`)
+                        // stands for dir contents if i forgor
+                        const dirc = fs.readdirSync(dir ?? cwd).map(f => {return {name: f, path: libs.path.join(dir ?? cwd, f), stat: fs.statSync(libs.path.join(dir ?? cwd, f))}});
+                        printf(dirc.map(f => {
+                            const perm = libs.perms.getPermStat(f.stat)
+                            return (f.stat.isDirectory() ? '\x1B[94m' : perm.includes('x') ? '\x1B[92m' : '') + f.name + '\x1B[0m'
+                        }).join('\n'))
+                    }
+                },
+                'cat': {
+                    aliases: [],
+                    usage: 'cd [path]',
+                    description: 'go to a different directory',
+                    fn: ([path]) => {
+                        const exact = path && (path.startsWith('/') || path.startsWith('~'))
+                        const fpath = exact ? path.replaceAll('~', users[user].home) : path ? libs.path.join(cwd, path.replaceAll('~', users[user].home)) : users[user].home;
+                        if (!fs.existsSync(fpath)) return printf(`cat: no such file or directory: ${path}`);
+                        if (fs.statSync(fpath).isDirectory()) return printf(`cat: Is a directory: ${path}`);
+                        
+                        printf(fs.readFileSync(fpath).toString())
+                    }
+                },
+                'cd': {
+                    aliases: [],
+                    usage: 'cd [path]',
+                    description: 'go to a different directory',
+                    fn: ([dir]) => {
+                        const exact = dir && (dir.startsWith('/') || dir.startsWith('~'))
+                        const newDir = exact ? dir.replaceAll('~', users[user].home) : dir ? libs.path.join(cwd, dir.replaceAll('~', users[user].home)) : users[user].home;
+                        if (!fs.existsSync(newDir)) return printf(`cd: no such file or directory: ${dir}`);
+                        if (!fs.statSync(newDir).isDirectory()) return printf(`cd: not a directory: ${dir}`);
+                        
+                        cwd = newDir
+                    }
+                },
+                
+                // MISC
+                'achievements': {
+                    aliases: [],
+                    usage: 'achievements',
+                    description: 'see your achievements (WIP)',
+                    fn: (argv) => {
+                        printf('WIP');
+                    }
+                },
+                'ws-ssh': {
+                    aliases: [],
+                    usage: 'ws-ssh <address> <password>',
+                    description: 'ssh into a wsSsh server',
+                    fn: ([addr, pass]) => {
+                        if (!addr) return printf('ws-ssh: Missing address');
+                        if (!pass) return printf('ws-ssh: Missing password');
+                        ws = new WebSocket(addr);
+                        wsSshMode = true
+                        ws.onopen = () => ws.send(pass);
+                        ws.onclose = ws.onerror = () => {
+                            printf('Socket closed');
+                            wsSshMode = false
+                        }
+                        
+                        ws.onmessage = async m => {
+                            console.log(m)
+                            if (typeof m.data == 'string') {
+                                return terminal.write(m.data.toString())
+                            }
+                            const data = m.data;
+                            const tx = await data.text();
+                            terminal.write(tx)
+                        }
+                        return true;
+                    }
+                }
+            }
+            
+            fs.mkdirSync('/usr')
+            fs.mkdirSync('/usr/bin')
+            fs.symlinkSync('/usr/bin', '/bin');
+            
+            for (const cmd in commands) {
+                const command = commands[cmd];
+                fs.writeFileSync('/usr/bin/'+cmd+'.js', command.fn.toString());
+                fs.chmod('/usr/bin/'+cmd+'.js', 775)
+            }
+            
+            fs.mkdirSync('/usr/share')
+            fs.mkdirSync('/usr/share/man')
+            
+            for (const cmd in commands) {
+                const command = commands[cmd];
+                fs.writeFileSync('/usr/share/man/'+cmd+'.hlp', `${cmd}${command.aliases.length > 0 ? '\nAliases: ' + command.aliases.join(', ') : ''}
+
+${command.description}
+
+Usage: ${command.usage}`)
+            }
+            
+            
+            
+            
+            // BEGIN TERMINAL CODE
+            let wsSshMode = false;
+            let ws;
+            let currentInput = "";
+            cwd = users[user].home;
+            env.set("HOME", users[user].home)
+            function prompt() {
+                let ps1 = env.get("PS1");
+                ps1 = ps1.replaceAll('\\u', users[user].username)
+                ps1 = ps1.replaceAll('\\h', hostname);
+                let shortCwdSplit = cwd.replaceAll(users[user].home, '~').split('/')
+                ps1 = ps1.replaceAll('\\d', shortCwdSplit[shortCwdSplit.length - 1] ?? '/')
+                ps1 = ps1.replaceAll('\\p', cwd.replaceAll(users[user].home, '~'));
+                ps1 = ps1.replaceAll('\\$', users[user].uid == 0 ? '#' : '$');
+                terminal.write(`\r`+ps1)
+            }
+            // mak terminal
+            const terminal = new Terminal({convertEol: true});
+            const fitAddon = new FitAddon.FitAddon();
+            window.onresize = function(event) {
+                fitAddon.fit();
+            };
+            terminal.loadAddon(fitAddon);
+            
+        
+            // uh terminal now displays yippee
+            terminal.open(document.getElementById('terminal'));
+            fitAddon.fit();  // resize terminale
+        
+            printf(`  ,-.       _,---._ __  / \\\r
+ /  )    .-'       \`./ /   \\\r
+(  (   ,'            \`/    /|\r
+ \\  \`-"             \\'\\   / |\r
+  \`.              ,  \\ \\ /  |\r
+   /\`.          ,'-\`----Y   |\r
+  (            ;        |   '\r
+  |  ,-.    ,-'         |  /\r
+  |  | (   |        hjw | /\r
+  )  |  \\  \`.___________|/\r
+  \`--'   \`--'\r
+
+welcome.`)
+            prompt();
+            terminal.write('figlet textmode');
+            printf(`\r
+\r _            _                       _
+\r| |_ _____  _| |_ _ __ ___   ___   __| | ___
+\r| __/ _ \\ \\/ / __| '_ \` _ \\ / _ \\ / _\` |/ _ \\
+\r| ||  __/>  <| |_| | | | | | (_) | (_| |  __/
+\r \\__\\___/_/\\_\\\\__|_| |_| |_|\\___/ \\__,_|\\___|`)
+            prompt();
+        
+            // Handle user input
+            terminal.onData(e => {
+                if (wsSshMode) {
+                    ws.send(e)
+                    return;
+                }
+                if (e === '\r') {  // Enter key pressed
+                    const [command, ...argv] = currentInput.split(' ')
+                    terminal.write('\n'); // Newline after command
+                    let foundCommand = Object.entries(commands).find(([cn, c]) => cn == command || c.aliases.includes(command))
+                    foundCommand = foundCommand ? foundCommand[1] :
+                        {
+                            fn: () => terminal.write(`Unknown command: ${command}`)  // Handle unknown commands
+                        }
+                    
+                    let noprompt = foundCommand.fn(argv)
+                    
+                    currentInput = '';
+                    if(!noprompt) prompt();
+                } else if (e === '\u007F') {  // Handle backspace (DEL)
+                    if (currentInput.length > 0) {
+                        currentInput = currentInput.slice(0, -1);  // Remove last character from input
+                        terminal.write('\b \b');  // Simulate backspace in terminal
+                    }
+                } else if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
+                    currentInput += e;
+                    terminal.write(e);
+                }
+            });
+        </script>
+    </body>
+</html>

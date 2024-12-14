@@ -1,0 +1,23 @@
+{
+  "name": "textmode-term-sp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "snowpack dev --polyfill-node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "snowpack": "^3.8.8"
+  },
+  "dependencies": {
+    "@isaacs/cliui": "^8.0.2",
+    "@isaacs/fs-minipass": "^4.0.1",
+    "@npmcli/arborist": "^8.0.0",
+    "eventemitter3": "^5.0.1",
+    "virtualfs": "^2.2.0"
+  }
+}
