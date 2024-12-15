@@ -1,4 +1,4 @@
-import System from "./main";
+import System from "./main.ts";
 import EventEmitter from "eventemitter3";
 
 export default class NYAterm {

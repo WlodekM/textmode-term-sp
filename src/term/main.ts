@@ -1,7 +1,7 @@
-import virtualfs from 'virtualfs/lib/VirtualFS';
+import virtualfs from '../lib/vfs/VirtualFS.ts';
 //@ts-ignore
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
-import * as std from "../lib/std"
+import * as std from "../lib/std.js"
 
 type User = {
     username: string,
@@ -10,6 +10,8 @@ type User = {
     uid: number,
     gid: number
 }
+
+console.log(virtualfs)
 
 export default class System {
     hostname: string

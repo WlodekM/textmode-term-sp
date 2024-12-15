@@ -1,5 +1,5 @@
-import System from "../term/main";
-import commands from "./commands";
+import System from "../term/main.ts";
+import commands from "./commands.ts";
 
 export default function makeFS(this: System) {
     this.fs.mkdirSync('/home')

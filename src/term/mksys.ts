@@ -1,5 +1,5 @@
-import System from "./main";
-import makeFS from "../lib/makeFS";
+import System from "./main.ts";
+import makeFS from "../lib/makeFS.ts";
 
 const system = new System();
 system.users.set(1, {
@@ -16,4 +16,6 @@ system.users.set(2, {
     uid: 2,
     gid: 1 // 1 is the guest group
 })
-makeFS.call(system)
+makeFS.call(system);
+
+export default system
