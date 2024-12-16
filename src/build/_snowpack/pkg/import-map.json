@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "eventemitter3": "./eventemitter3.js",
+    "memfs": "./memfs.js"
+  }
+}

@@ -2,6 +2,7 @@ import virtualfs, { memfs } from 'memfs';
 //@ts-ignore
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
 import * as std from "../lib/std.js"
+import std2 from "../lib/std2.ts"
 
 export type User = {
     username: string,
@@ -19,6 +20,7 @@ export default class System {
     libs = {
         path,
         std,
+        std2: std2,
         perms: {
             getPerm(permissionNumber, userLevel) {
                 // Ensure the permission number is within valid range (0 to 777)
