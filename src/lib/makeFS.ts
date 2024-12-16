@@ -6,7 +6,7 @@ export default function makeFS(this: System) {
     this.fs.mkdirSync('/etc')
     this.fs.mkdirSync('/usr')
     this.fs.mkdirSync('/usr/bin')
-    this.fs.symlinkSync('/bin', '/usr/bin')
+    this.fs.symlinkSync('/usr/bin', '/bin')
     for (const [uid, user] of this.users.entries()) {
         this.fs.mkdirSync(user.home)
         this.fs.chownSync(user.home, uid, user.gid)

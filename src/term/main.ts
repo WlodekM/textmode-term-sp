@@ -3,15 +3,13 @@ import virtualfs, { memfs } from 'memfs';
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
 import * as std from "../lib/std.js"
 
-type User = {
+export type User = {
     username: string,
     root: boolean,
     home: string,
     uid: number,
     gid: number
 }
-
-console.log(virtualfs)
 
 export default class System {
     hostname: string

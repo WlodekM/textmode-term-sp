@@ -1,4 +1,4 @@
-import System from "./main.ts";
+import System, { User } from "./main.ts";
 import EventEmitter from "eventemitter3";
 
 export default class NYAterm {
@@ -13,8 +13,8 @@ export default class NYAterm {
     set pwd(v: string) {
         this.env.set('PWD', v)
     }
-    get user() {
-        return this.system.users.get(this.user)
+    get user(): User {
+        return this.system.users.get(this.uid) as User
     }
     constructor(sys: System, uid: number) {
         this.system = sys
