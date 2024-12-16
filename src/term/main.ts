@@ -1,4 +1,4 @@
-import virtualfs from '../lib/vfs/VirtualFS.ts';
+import virtualfs, { memfs } from 'memfs';
 //@ts-ignore
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
 import * as std from "../lib/std.js"
@@ -15,7 +15,8 @@ console.log(virtualfs)
 
 export default class System {
     hostname: string
-    fs = new virtualfs();
+    memfs = memfs();
+    fs = this.memfs.fs;
     users: Map<number, User> = new Map<number, User>();
     libs = {
         path,

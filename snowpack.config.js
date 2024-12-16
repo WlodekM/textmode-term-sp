@@ -14,6 +14,7 @@ module.exports = {
   ],
   packageOptions: {
     /* ... */
+    knownEntrypoints: ['has-symbols', 'call-bind']
   },
   devOptions: {
     /* ... */
@@ -21,4 +22,5 @@ module.exports = {
   buildOptions: {
     /* ... */
   },
+  
 };
