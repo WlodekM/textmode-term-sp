@@ -37,7 +37,7 @@ export default class NYAterm {
         ps1 = ps1.replaceAll('\\$', this.uid == 0 ? '#' : '$');
         this.events.emit('data', `\r`+ps1)
     }
-    write(text: string) {
+    async write(text: string) {
         if (text === '\r') {  // Enter key pressed
             const [command, ...argv] = this.input.split(' ')
             this.events.emit('data', '\n'); // Newline after command
@@ -49,15 +49,18 @@ export default class NYAterm {
                     this.system.libs.perms.getPermStat(
                         this.system.fs.statSync(
                             this.system.libs.path.join('/usr/bin', cn)
-                        ), this.uid
+                        ), this.user
                     )?.includes('x')
                 );
             
-            let foundCommandFunc = foundCommand ? eval(this.system.fs.readFileSync(this.system.libs.path.join('/usr/bin', foundCommand)).toString()) : function () { this.events.emit('data', `Unknown command: ${command}`) }  // Handle unknown commands
-            
-            foundCommandFunc(argv)
+            let cmdTxt = this.system.fs.readFileSync(this.system.libs.path.join('/usr/bin', foundCommand)).toString();
+            let cmdUri = 'data:text/javascript;base64,'+btoa(cmdTxt)
+            let foundCommandFunc = foundCommand ? (await import(cmdUri)).default : (function () { this.events.emit('data', `Unknown command: ${command}`) })  // Handle unknown commands
+            console.log(typeof foundCommandFunc, foundCommandFunc)
+            foundCommandFunc.call(this.system, argv)
             
             this.input = '';
+            this.prompt()
         } else if (text === '\u007F') {  // Handle backspace (DEL)
             if (this.input.length > 0) {
                 this.input = this.input.slice(0, -1);  // Remove last character from input

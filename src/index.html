@@ -26,13 +26,15 @@
         <script type="module">
             import system from "./term/mksys.ts"
             import NYA from './term/nya.ts';
-            const term = new NYA(system, 2)
+            const term = window.term = new NYA(system, 2);
+            const std = term.system.libs.std;
             // mak terminal
-            const terminal = new Terminal({convertEol: true});
+            const terminal = window.terminal = new Terminal({convertEol: true});
             const fitAddon = new FitAddon.FitAddon();
             window.onresize = function(event) {
                 fitAddon.fit();
             };
+            term.events.on('data', d => terminal.write(d))
             terminal.loadAddon(fitAddon);
             
         
@@ -40,7 +42,7 @@
             terminal.open(document.getElementById('terminal'));
             fitAddon.fit();  // resize terminale
         
-            printf(`  ,-.       _,---._ __  / \\\r
+            std.printf(`  ,-.       _,---._ __  / \\\r
  /  )    .-'       \`./ /   \\\r
 (  (   ,'            \`/    /|\r
  \\  \`-"             \\'\\   / |\r
@@ -53,45 +55,18 @@
   \`--'   \`--'\r
 
 welcome.`)
-            prompt();
+            term.prompt();
             terminal.write('figlet textmode');
-            printf(`\r
+            std.printf(`\r
 \r _            _                       _
 \r| |_ _____  _| |_ _ __ ___   ___   __| | ___
 \r| __/ _ \\ \\/ / __| '_ \` _ \\ / _ \\ / _\` |/ _ \\
 \r| ||  __/>  <| |_| | | | | | (_) | (_| |  __/
 \r \\__\\___/_/\\_\\\\__|_| |_| |_|\\___/ \\__,_|\\___|`)
-            prompt();
+            term.prompt();
         
             // Handle user input
-            terminal.onData(e => {
-                if (wsSshMode) {
-                    ws.send(e)
-                    return;
-                }
-                if (e === '\r') {  // Enter key pressed
-                    const [command, ...argv] = currentInput.split(' ')
-                    terminal.write('\n'); // Newline after command
-                    let foundCommand = Object.entries(commands).find(([cn, c]) => cn == command || c.aliases.includes(command))
-                    foundCommand = foundCommand ? foundCommand[1] :
-                        {
-                            fn: () => terminal.write(`Unknown command: ${command}`)  // Handle unknown commands
-                        }
-                    
-                    let noprompt = foundCommand.fn(argv)
-                    
-                    currentInput = '';
-                    if(!noprompt) prompt();
-                } else if (e === '\u007F') {  // Handle backspace (DEL)
-                    if (currentInput.length > 0) {
-                        currentInput = currentInput.slice(0, -1);  // Remove last character from input
-                        terminal.write('\b \b');  // Simulate backspace in terminal
-                    }
-                } else if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
-                    currentInput += e;
-                    terminal.write(e);
-                }
-            });
+            terminal.onData(e => term.write(e));
         </script>
     </body>
 </html>

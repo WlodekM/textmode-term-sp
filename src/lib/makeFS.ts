@@ -13,7 +13,7 @@ export default function makeFS(this: System) {
     }
     for (const cmd in commands) {
         const command = commands[cmd];
-        this.fs.writeFileSync(`/usr/bin/${cmd}.js`, command.toString())
+        this.fs.writeFileSync(`/usr/bin/${cmd}.js`, 'export default ' + command.toString())
         this.fs.chmodSync(`/usr/bin/${cmd}.js`, 775)
     }
 }

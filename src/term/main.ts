@@ -72,7 +72,7 @@ export default class System {
             
             getPermStat(stat, user) {
                 const mode = parseInt((stat.mode & 0o777).toString(8).padStart(3, '0'), 10)
-                const perm = this.users[user].uid == stat.uid ? 'u' : this.users[user].gid == stat.gid ? 'g' : 'o';
+                const perm = user.uid == stat.uid ? 'u' : user.gid == stat.gid ? 'g' : 'o';
                 return this.getPerm(mode, perm)
             }
         }
