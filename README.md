@@ -30,3 +30,4 @@ it is live-updating so when you make any changes it'll reload the page for you
 - [ ] chmod with flags (e. +x -x)
 - [ ] cp command (with -r)
 - [ ] actually check permissions before doing something with the fs
+- [ ] move commands to their own files
