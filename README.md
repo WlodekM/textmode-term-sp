@@ -31,3 +31,4 @@ it is live-updating so when you make any changes it'll reload the page for you
 - [ ] cp command (with -r)
 - [ ] actually check permissions before doing something with the fs
 - [ ] move commands to their own files
+- [ ] possibly use some snowpack plugin magic to either bundle the commands into 1 file or save an index of all commands

@@ -1,7 +1,7 @@
 import System from "../term/main.ts";
 import commands from "./commands.ts";
 
-export default function makeFS(this: System) {
+export default async function makeFS(this: System) {
     this.fs.mkdirSync('/home')
     this.fs.mkdirSync('/etc')
     this.fs.mkdirSync('/usr')
@@ -11,8 +11,8 @@ export default function makeFS(this: System) {
         this.fs.mkdirSync(user.home)
         this.fs.chownSync(user.home, uid, user.gid)
     }
-    for (const cmd in commands) {
-        const command = commands[cmd];
+    for (const cmd of commands) {
+        const command = (await import(`../commands/${cmd}.js`)).default;
         this.fs.writeFileSync(`/usr/bin/${cmd}.js`, 'export default ' + command.toString())
         this.fs.chmodSync(`/usr/bin/${cmd}.js`, 775)
     }

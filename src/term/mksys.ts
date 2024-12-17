@@ -16,6 +16,6 @@ system.users.set(2, {
     uid: 2,
     gid: 1 // 1 is the guest group
 })
-makeFS.call(system);
+await makeFS.call(system);
 
 export default system
