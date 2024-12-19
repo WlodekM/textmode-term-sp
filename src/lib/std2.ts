@@ -6,5 +6,5 @@ export default function std2(stdio: { stdout: WritableStreamDefaultWriter }, exi
         printf(`${name}: ${error}`);
         exitf(1);
     }
-    return { printf }
+    return { printf, err }
 }
