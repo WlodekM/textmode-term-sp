@@ -23,14 +23,15 @@
         "call-bind": "1.0.0"
     },
     "dependencies": {
+        "@xterm/xterm": "^5.5.0",
         "buffer": "^6.0.3",
+        "call-bind": "1.0.0",
         "esinstall": "0.5.0",
         "eventemitter3": "^5.0.1",
         "has-symbols": "^1.1.0",
         "memfs": "^4.15.0",
         "object.assign": "3.0.1",
         "process": "^0.11.10",
-        "url": "^0.11.4",
-        "call-bind": "1.0.0"
+        "url": "^0.11.4"
     }
 }

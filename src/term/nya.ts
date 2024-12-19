@@ -1,5 +1,6 @@
 import System, { User } from "./main.ts";
 import EventEmitter from "eventemitter3";
+import type { Terminal } from "@xterm/xterm"
 
 type Program = {
     signal: {
@@ -25,6 +26,7 @@ export default class NYAterm {
     events: EventEmitter = new EventEmitter();
     libs;
     currentProgram: Program | null = null;
+    xterm?: Terminal;
     get pwd(): string {
         return this.env.get("PWD") as string
     }
@@ -34,8 +36,9 @@ export default class NYAterm {
     get user(): User {
         return this.system.users.get(this.uid) as User
     }
-    constructor(sys: System, uid: number) {
+    constructor(sys: System, uid: number, xterm?: Terminal) {
         this.system = sys
+        if (xterm) this.xterm = xterm
         this.libs = this.system.libs;
         this.env.set("PS1", '[\\u@\\h \\d]\\$ ')
         this.env.set("SHELL", '/usr/sbin/nya-shell.js')

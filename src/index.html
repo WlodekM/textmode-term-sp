@@ -26,10 +26,11 @@
         <script type="module">
             import system from "./term/mksys.ts"
             import NYA from './term/nya.ts';
-            const term = window.term = new NYA(system, 2);
+            import xterm from "@xterm/xterm"
+            const terminal = window.terminal = new Terminal({convertEol: true});
+            const term = window.term = new NYA(system, 2, terminal);
             const std = term.system.libs.std;
             // mak terminal
-            const terminal = window.terminal = new Terminal({convertEol: true});
             const fitAddon = new FitAddon.FitAddon();
             window.onresize = function(event) {
                 fitAddon.fit();
