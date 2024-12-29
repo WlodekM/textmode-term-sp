@@ -1,14 +1,14 @@
-import type NYAterm from "../term/nya";
+// deno-lint-ignore-file ban-ts-comment
+import type NYAterm from "../term/nya.ts";
 import type EventEmitter from "eventemitter3";
 
 
 export default function (
     this: NYAterm,
     exit: (code: number) => void,
-    [debug],
+    [debug]: [string],
     stdout: WritableStreamDefaultWriter,
     stdin: EventEmitter,
-    signal: ReadableStreamDefaultReader<string>
 ) {
     const { printf, size } = this.libs.std2({ stdout }, exit, 'game', this);
     class Board<T> {
@@ -26,14 +26,14 @@ export default function (
          * Get an element
          */
         get(x: number, y: number): T {
-            return this.board[x + (y * this.width)]
+            return this.board[x + ((this.height - y) * this.width)]
         }
     
         /**
          * Set an element
          */
         set(x: number, y: number, el: T): T {
-            return this.board[x + (y * this.width)] = el;
+            return this.board[x + ((this.height - y) * this.width)] = el;
         }
     
         getAll() {
@@ -149,11 +149,50 @@ export default function (
     }
     
     type dir = 'up' | 'down' | 'left' | 'right'
-    
-    class PlayerTile extends Tile {
+
+    class PositionedTile extends Tile {
+        private _x: number;
+        private _y: number;
+        get pos(): [number, number] {
+            return [this._x, this._y]
+        }
+        set pos([x, y]) {
+            grid.set(this._x, this._y, new Tile(new Color('brightBlack'), TileType.Empty))
+            this._x = x
+            this._y = y
+            grid.set(this._x, this._y, this)
+        }
+        get x() {
+            return this._x
+        }
+        set x(v: number) {
+            grid.set(this._x, this._y, new Tile(new Color('brightBlack'), TileType.Empty))
+            this._x = v
+            grid.set(this._x, this._y, this)
+        }
+        get y() {
+            return this._y
+        }
+        set y(v: number) {
+            grid.set(this._x, this._y, new Tile(new Color('brightBlack'), TileType.Empty))
+            this._y = v
+            grid.set(this._x, this._y, this)
+        }
+        constructor(x: number, y: number, color: Color, type: TileType) {
+            super(color, type)
+            this._x = x;
+            this._y = y;
+            grid.set(x, y, this)
+        }
+        destroy() {
+            grid.set(this._x, this._y, new Tile(new Color('brightBlack'), TileType.Empty))
+        }
+    }
+
+    class PlayerTile extends PositionedTile {
         direction: dir = 'down'
-        constructor() {
-            super(new Color('red'), TileType.Player)
+        constructor(x: number, y: number) {
+            super(x, y, new Color('red'), TileType.Player)
         }
     }
     
@@ -170,35 +209,66 @@ export default function (
         return new Tile(new Color('brightBlack', 'reset', false), TileType.Empty)
     })
 
-    const playerPos = [10, 5]
-    grid.set(playerPos[0], playerPos[1], new PlayerTile())
+    const snek: PositionedTile[] = [new PlayerTile(10, 5)]
+
     grid.set(0, 1, new Tile(new Color('reset'), TileType.Wall))
 
-    //@ts-expect-error
-    if (debug == '1') {window.grid = grid;window.tiledict = tiledict}
+    // deno-lint-ignore no-window
+    if (debug == '1') {
+        //@ts-expect-error
+        window.grid = grid;
+        //@ts-expect-error
+        window.tiledict = tiledict
+        //@ts-expect-error
+        window.getPlayerPos = () => {return playerPos};
+        //@ts-expect-error
+        window.snek = snek
+    }
 
     const [w, h] = size()
 
-    stdout.write(`\x1B[2J\x1B[0;0H`)
+    let moveDir: number | null = null;
 
-    function frame() {
-        stdout.write("\x1B[2J") // erase display (but not scrollback buffer)
-        printf('Dungon gaem');
-        const gride = grid.getAll().map<string[]>(a => a.map<string>(t => t.color.toString() + tiledict[t.type].call(t)))
-        printf(gride.map<string>(r => r.join('')).join('\n'))
-        stdout.write(`${new Color('reset')}HP: 100/100`)
+    function move() {
+        if (moveDir == null) return;
+        const deltas: [number, number][] = [[0, 1], [-1, 0], [0, -1], [1, 0]];
+        const dirs: dir[] = ['up', 'left', 'down', 'right']
+        const delta: [number, number] = deltas[moveDir];
+        const newPlrPos = snek[0].pos.map((p, i) => p + delta[i]) as [number, number];
+        if (newPlrPos[0] < 0 ||
+            newPlrPos[1] <= 0 ||
+            newPlrPos[0] >= grid.width ||
+            newPlrPos[1] > grid.height) return;
+        if(grid.get(...newPlrPos).type != 'Empty') return;
+        snek.pop()?.destroy()
+        const newPlr = new PlayerTile(...newPlrPos);
+        snek.unshift(newPlr)
+        newPlr.direction = dirs[moveDir]
     }
 
-    stdin.on('data', key => {
+    function frame() {
+        move()
+        const gride = grid.getAll().map<string[]>(a => a.map<string>(t => t.color.toString() + tiledict[t.type].call(t)))
+        stdout.write(`\x1B[2J\x1B[0;0H` + 'Snake Game\n' +
+            gride.map<string>(r => r.join('')).join('\n') + '\n' +
+            `${new Color('reset')}Length: ${snek.length}`)
+    }
+
+    stdin.on('data', (key: string) => {
         switch (key) {
+            case 'd':
+            case 's':
+            case 'a':
             case 'w':
-                
+                moveDir = 'wasd'.split('').indexOf(key);
                 break;
         
             default:
                 break;
         }
     })
+
+    setInterval(frame, 1000 / 10)
 
     frame()
 }

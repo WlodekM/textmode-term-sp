@@ -24,9 +24,11 @@
             <a href="https://cd5k.net/tau/">&tau;</a>
         </div>
         <script type="module">
-            import system from "./term/mksys.ts"
+            import mksys from "./term/mksys.ts"
             import NYA from './term/nya.ts';
-            import xterm from "@xterm/xterm"
+            import xterm from "@xterm/xterm";
+            const system = await mksys(localStorage.getItem('fs'));
+            console.log(system)
             const terminal = window.terminal = new Terminal({convertEol: true});
             const term = window.term = new NYA(system, 2, terminal);
             const std = term.system.libs.std;
@@ -38,6 +40,14 @@
             term.events.on('data', d => terminal.write(d))
             terminal.loadAddon(fitAddon);
             
+            window.onbeforeunload = function (e) {
+                if (document.location.search == '?ns') return;
+                localStorage.setItem('fs', JSON.stringify(term.system.getFSjson()))
+            };
+
+            if (localStorage.getItem('fs') !== null) {
+                console.log('can haz fs!', localStorage.getItem('fs'))
+            }
         
             // uh terminal now displays yippee
             terminal.open(document.getElementById('terminal'));

@@ -92,7 +92,7 @@ export default class NYAterm {
             let cmdUri = 'data:text/javascript;base64,'+btoa(cmdTxt)
             let foundCommandFunc = foundCommand ? (await import(cmdUri)).default : (function () { this.events.emit('data', `Unknown command: ${command}`) })  // Handle unknown commands
             
-            let sendSignal = signal => {};
+            let sendSignal = (_: any) => {};
             const signalStream: ReadableStream<string> = new ReadableStream<string>({
                 start(controller) {
                     sendSignal = controller.enqueue

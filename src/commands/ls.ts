@@ -12,7 +12,7 @@ export default function (exit, [dir]) {
             stat: this.system.fs.statSync(this.system.libs.path.join(dir ?? this.pwd, f))
         }
     });
-    printf(dirc.map(f => {
+    printf(dirc.map((f) => {
         const perm = this.system.libs.perms.getPermStat(f.stat, this.uid)
         return (f.stat.isDirectory() ? '\x1B[94m' : perm.includes('x') ? '\x1B[92m' : '') + f.name + '\x1B[0m'
     }).join('\n'));
