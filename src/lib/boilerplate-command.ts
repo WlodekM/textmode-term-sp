@@ -9,7 +9,7 @@ function boilerplate (
     stdin: EventEmitter,
     signal: ReadableStreamDefaultReader<string>
 ) {
-    const { printf, err } = this.libs.std2({ stdout }, exit, 'boilerplate');
+    const { printf, err } = this.libs.std2({ stdout }, exit, 'boilerplate', this);
     const path = this.libs.path;
     const fs = this.system.fs
 

@@ -2,7 +2,7 @@ import type NYAterm from "../term/nya";
 import type EventEmitter from "eventemitter3";
 
 export default function (this: NYAterm, exit, [filename], stdout: WritableStreamDefaultWriter, stdin: EventEmitter, signal: ReadableStreamDefaultReader<string>) {
-    const { printf } = this.libs.std2({ stdout });
+    const { printf } = this.libs.std2({ stdout }, exit, 'meow', this);
 
     stdout.write('\x1B[s')
 
