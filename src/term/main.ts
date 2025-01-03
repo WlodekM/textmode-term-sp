@@ -3,6 +3,7 @@ import { memfs, IFs, vol } from 'memfs';
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
 import * as std from "../lib/std.js"
 import std2 from "../lib/std2.ts"
+import cfonts from 'cfonts'
 
 export type User = {
     username: string,
@@ -48,6 +49,7 @@ export default class System {
         path,
         std,
         std2: std2,
+        cfonts,
         perms: {
             getPerm(permissionNumber, userLevel) {
                 // Ensure the permission number is within valid range (0 to 777)
@@ -100,9 +102,13 @@ export default class System {
             },
 
             getPermStat(stat, user) {
+                return this.getPermStatLevel(stat, user)[0]
+            },
+
+            getPermStatLevel(stat, user) {
                 const mode = parseInt((stat.mode & 0o777).toString(8).padStart(3, '0'), 10)
-                const perm = user.uid == stat.uid ? 'u' : user.gid == stat.gid ? 'g' : 'o';
-                return this.getPerm(mode, perm)
+                const perm = user.uid == stat.uid || user.uid == 0 ? 'u' : user.gid == stat.gid ? 'g' : 'o';
+                return [this.getPerm(mode, perm), perm]
             }
         }
     }
