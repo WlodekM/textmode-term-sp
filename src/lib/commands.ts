@@ -9,7 +9,8 @@ const commands = [
     'meow',
     'mkdir',
     'touch',
-    'game'
+    'game',
+    'figlet'
 ]
 
 export default commands
