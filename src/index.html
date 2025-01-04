@@ -6,7 +6,6 @@
         <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@latest/lib/xterm.js"></script>
         <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@latest/lib/xterm-addon-attach.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@latest/lib/addon-fit.js"></script>
-        <link rel="stylesheet" href="./textmode.css" />
         <style>
             body {
                 height: 100vh;
@@ -21,17 +20,27 @@
     <body>
         <div id="terminal"></div>
         <div style="text-align:right">
+            <a class="red" style="cursor: pointer;" id="dev">DEV</a>
             <a href="https://cd5k.net/tau/">&tau;</a>
         </div>
         <script type="module">
             import mksys from "./term/mksys.ts"
             import NYA from './term/nya.ts';
             import xterm from "@xterm/xterm";
+            import './textmode.less';
             const system = await mksys(localStorage.getItem('fs'));
             console.log(system)
             const terminal = window.terminal = new Terminal({convertEol: true});
             const term = window.term = new NYA(system, 2, terminal);
             const std = term.system.libs.std;
+            document.getElementById('dev').onclick = () => {
+                let r = confirm('reset FS?');
+                if(r) {
+                    localStorage.clear();
+                    window.onbeforeunload = () => {};
+                    document.location.reload()
+                }
+            }
             // mak terminal
             const fitAddon = new FitAddon.FitAddon();
             window.onresize = function(event) {

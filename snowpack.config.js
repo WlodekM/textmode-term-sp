@@ -9,8 +9,7 @@ module.exports = {
     
   },
   plugins: [
-    /* ... */
-    
+    ['snowpack-plugin-less', {}]
   ],
   packageOptions: {
     /* ... */
@@ -21,6 +20,7 @@ module.exports = {
   },
   buildOptions: {
     /* ... */
+    style: 'compressed', // 'compressed' or 'expanded'
   },
   
 };

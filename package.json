@@ -14,7 +14,8 @@
     "license": "ISC",
     "description": "",
     "devDependencies": {
-        "snowpack": "3.8.6"
+        "snowpack": "3.8.6",
+        "snowpack-plugin-less": "^1.0.7"
     },
     "overrides": {
         "call-bind": "1.0.0"
@@ -23,11 +24,14 @@
         "call-bind": "1.0.0"
     },
     "dependencies": {
+        "@types/figlet": "^1.7.0",
         "@xterm/xterm": "^5.5.0",
         "buffer": "^6.0.3",
         "call-bind": "1.0.0",
+        "cfonts": "^3.3.0",
         "esinstall": "0.5.0",
         "eventemitter3": "^5.0.1",
+        "figlet": "^1.8.0",
         "has-symbols": "^1.1.0",
         "memfs": "^4.15.0",
         "object.assign": "3.0.1",

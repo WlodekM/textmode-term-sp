@@ -177,6 +177,7 @@ export default class NYAterm {
             )
         } catch (error) {
             this.events.emit('data', 'Uncaught error: ' + error + '\n');
+            console.error(error)
             exit(1)
         }
     }

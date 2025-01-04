@@ -1,0 +1,432 @@
+body {
+    background: black;
+    margin: 0;
+    font-family: monospace;
+    color: white;
+    font-size: 150%;
+}
+
+/* THEME */
+:root {
+    --red: #ff4040;
+    --green: #40ff40;
+    --yellow: #ffff40;
+    --blue: #6060ff;
+    --cyan: #40ffff;
+    --magenta: #ff40ff;
+    --darkRed: #bf0000;
+    --darkGreen: #00bf00;
+    --darkYellow: #bfbf00;
+    --darkBlue: #0000bf;
+    --darkCyan: #00bfbf;
+    --darkMagenta: #bf00bf;
+    --white: #ffffff;
+};
+
+@colors: {
+    red: #ff4040;
+    green: #40ff40;
+    yellow: #ffff40;
+    blue: #6060ff;
+    cyan: #40ffff;
+    magenta: #ff40ff;
+    darkRed: #bf0000;
+    darkGreen: #00bf00;
+    darkYellow: #bfbf00;
+    darkBlue: #0000bf;
+    darkCyan: #00bfbf;
+    darkMagenta: #bf00bf;
+    white: #ffffff;
+};
+
+@red: #ff4040;
+@green: #40ff40;
+@yellow: #ffff40;
+@blue: #6060ff;
+@cyan: #40ffff;
+@magenta: #ff40ff;
+@darkRed: #bf0000;
+@darkGreen: #00bf00;
+@darkYellow: #bfbf00;
+@darkBlue: #0000bf;
+@darkCyan: #00bfbf;
+@darkMagenta: #bf00bf;
+@white: #ffffff;
+
+/* Link styling */
+a {
+    &::before {
+        color: @cyan;
+        content: "[";
+    }
+    
+    &::after {
+        color: @cyan;
+        content: "]";
+    }
+
+    each(@colors, {
+        &.@{key}::before {
+            color: @value
+        }
+        &.@{key}::after {
+            color: @value
+        }
+    });
+    
+    &.no-deco:hover {
+        text-decoration: underline;
+    }
+    
+    color: @cyan;
+    text-decoration: none;
+    
+    #user {
+        &::before {
+            color: #ff5f00;
+            content: "<";
+        }
+        
+        &::after {
+            color: #ff5f00;
+            content: ">";
+        }
+        color: #ff5f00;
+    }
+
+    #nav-link {
+        color: @yellow;
+        margin-bottom: 2px;
+        display: block;
+        
+        &::before, &::after, .no-deco::before, .no-deco::after {
+            display: none;
+        }
+    }
+};
+
+/* General styling */
+h3, h2, h1 {
+    font-size: calc(1rem * 1.5);
+}
+
+h1 {
+    &::before {
+        color: @red;
+        content: "# ";
+    }
+}
+
+h2 {
+    &::before {
+        color: @blue;
+        content: "## ";
+    }
+}
+
+h3 {
+    &::before {
+        color: @magenta;
+        content: "### ";
+    }
+}
+
+h1.nomargin, h2.nomargin, h3.nomargin {
+    margin-top: 0;
+}
+
+li {
+    &::before {
+        color: @magenta;
+        content: "- ";
+    }
+    
+    color: @magenta;
+    list-style: none;
+};
+
+/* COLORS!!!1 */
+each(@colors, {
+    .@{key} {
+        color: @value
+    }
+});
+
+/* text styles */
+.bold { font-weight: bold; }
+.italic { font-style: italic; }
+
+
+
+/* underlined, crossed out and overlined text */
+@media only screen {
+    .underline { 
+        text-decoration-color: @white !important;
+        text-decoration: underline;
+    }
+    
+    .red-underline { 
+        text-decoration-color: @red !important; 
+        text-decoration: underline; 
+    }
+    
+    .green-underline { 
+        text-decoration-color: @green !important; 
+        text-decoration: underline; 
+    }
+
+    .yellow-underline { 
+        text-decoration-color: @yellow !important; 
+        text-decoration: underline; 
+    }
+
+    .blue-underline { 
+        text-decoration-color: @blue !important; 
+        text-decoration: underline; 
+    }
+
+    .cyan-underline { 
+        text-decoration-color: @cyan !important; 
+        text-decoration: underline; 
+    }
+
+    .magenta-underline { 
+        text-decoration-color: @magenta !important; 
+        text-decoration: underline; 
+    }
+
+    .underline-wavy { 
+        text-decoration-color: @white !important;
+        text-decoration: underline wavy;
+    }
+
+    .red-underline-wavy { 
+        text-decoration-color: @red !important;
+        text-decoration: underline wavy;
+    }
+
+    .green-underline-wavy { 
+        text-decoration-color: @green !important;
+        text-decoration: underline wavy;
+    }
+
+    .yellow-underline-wavy { 
+        text-decoration-color: @yellow !important;
+        text-decoration: underline wavy;
+    }
+
+    .blue-underline-wavy { 
+        text-decoration-color: @blue !important;
+        text-decoration: underline wavy;
+    }
+
+    .cyan-underline-wavy { 
+        text-decoration-color: @cyan !important;
+        text-decoration: underline wavy;
+    }
+
+    .magenta-underline-wavy { 
+        text-decoration-color: @magenta !important;
+        text-decoration: underline wavy;
+    }
+
+    .underline-dotted { 
+        text-decoration-color: @white !important;
+        text-decoration: underline dotted;
+    }
+
+    .red-underline-dotted { 
+        text-decoration-color: @red !important;
+        text-decoration: underline dotted;
+    }
+
+    .green-underline-dotted { 
+        text-decoration-color: @green !important;
+        text-decoration: underline dotted;
+    }
+
+    .yellow-underline-dotted { 
+        text-decoration-color: @yellow !important;
+        text-decoration: underline dotted;
+    }
+
+    .blue-underline-dotted { 
+        text-decoration-color: @blue !important;
+        text-decoration: underline dotted;
+    }
+
+    .cyan-underline-dotted { 
+        text-decoration-color: @cyan !important;
+        text-decoration: underline dotted;
+    }
+
+    .magenta-underline-dotted { 
+        text-decoration-color: @magenta !important;
+        text-decoration: underline dotted;
+    }
+
+    .overline { 
+        text-decoration-color: @white !important;
+        text-decoration: overline;
+    }
+
+    .red-overline { 
+        text-decoration-color: @red !important;
+        text-decoration: overline;
+    }
+
+    .green-overline { 
+        text-decoration-color: @green !important;
+        text-decoration: overline;
+    }
+
+    .yellow-overline { 
+        text-decoration-color: @yellow !important;
+        text-decoration: overline;
+    }
+
+    .blue-overline { 
+        text-decoration-color: @blue !important;
+        text-decoration: overline;
+    }
+
+    .cyan-overline { 
+        text-decoration-color: @cyan !important;
+        text-decoration: overline;
+    }
+
+    .magenta-overline { 
+        text-decoration-color: @magenta !important;
+        text-decoration: overline;
+    }
+
+    .overline-wavy { 
+        text-decoration-color: @white !important;
+        text-decoration: overline wavy;
+    }
+
+    .red-overline-wavy { 
+        text-decoration-color: @red !important;
+        text-decoration: overline wavy;
+    }
+
+    .green-overline-wavy { 
+        text-decoration-color: @green !important;
+        text-decoration: overline wavy;
+    }
+
+    .yellow-overline-wavy { 
+        text-decoration-color: @yellow !important;
+        text-decoration: overline wavy;
+    }
+
+    .blue-overline-wavy { 
+        text-decoration-color: @blue !important;
+        text-decoration: overline wavy;
+    }
+
+    .cyan-overline-wavy { 
+        text-decoration-color: @cyan !important;
+        text-decoration: overline wavy;
+    }
+
+    .magenta-overline-wavy { 
+        text-decoration-color: @magenta !important;
+        text-decoration: overline wavy;
+    }
+
+    .red-overline-dotted { 
+        text-decoration-color: @red !important;
+        text-decoration: overline dotted;
+    }
+
+    .green-overline-dotted { 
+        text-decoration-color: @green !important;
+        text-decoration: overline dotted;
+    }
+
+    .yellow-overline-dotted { 
+        text-decoration-color: @yellow !important;
+        text-decoration: overline dotted;
+    }
+
+    .blue-overline-dotted { 
+        text-decoration-color: @blue !important;
+        text-decoration: overline dotted;
+    }
+
+    .cyan-overline-dotted { 
+        text-decoration-color: @cyan !important;
+        text-decoration: overline dotted;
+    }
+
+    .magenta-overline-dotted { 
+        text-decoration-color: @magenta !important;
+        text-decoration: overline dotted;
+    }
+
+    .crossed { 
+        text-decoration-color: @white !important;
+        text-decoration: line-through;
+    }
+
+    .red-crossed { 
+        text-decoration-color: @red !important;
+        text-decoration: line-through;
+    }
+
+    .green-crossed { 
+        text-decoration-color: @green !important;
+        text-decoration: line-through;
+    }
+
+    .yellow-crossed { 
+        text-decoration-color: @yellow !important;
+        text-decoration: line-through;
+    }
+
+    .blue-crossed { 
+        text-decoration-color: @blue !important;
+        text-decoration: line-through;
+    }
+
+    .cyan-crossed { 
+        text-decoration-color: @cyan !important;
+        text-decoration: line-through;
+    }
+
+    .magenta-crossed { 
+        text-decoration-color: @magenta !important;
+        text-decoration: line-through;
+    }
+
+    .dark-red-underline { 
+        text-decoration-color: @darkRed !important;
+        text-decoration: underline;
+    }
+
+    .dark-green-underline { 
+        text-decoration-color: @darkGreen !important;
+        text-decoration: underline;
+    }
+
+    .dark-yellow-underline { 
+        text-decoration-color: @darkYellow !important;
+        text-decoration: underline;
+    }
+
+    .dark-blue-underline { 
+        text-decoration-color: @darkBlue !important;
+        text-decoration: underline;
+    }
+
+    .dark-cyan-underline { 
+        text-decoration-color: @darkCyan !important;
+        text-decoration: underline;
+    }
+
+    .dark-magenta-underline { 
+        text-decoration-color: @darkMagenta !important;
+        text-decoration: underline;
+    }
+}
