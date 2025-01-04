@@ -47,7 +47,7 @@ it is live-updating so when you make any changes it'll reload the page for you
 
 the manager is the most low-level part of tmt
 
-it may start programs while providing them with the tty, but that is the only thing that it provides
+it may start programs while providing them with the tty and std, but those are the only things that it provides
 
 ## ttys
 
