@@ -32,7 +32,7 @@ it is live-updating so when you make any changes it'll reload the page for you
 - [x] move commands to their own files
 - [ ] possibly use some snowpack plugin magic to either bundle the commands into 1 file or save an index of all commands
 - [ ] refactor everything to make nyash a program and to use ttys (see [architecture](#architecture))
-- [ ] make avancedFsJson support symlinks
+- [ ] make advancedFsJson support symlinks
 
 # IN PROGRESS
 - [ ] actually check permissions before doing something with the fs
