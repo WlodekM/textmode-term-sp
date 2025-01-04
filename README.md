@@ -65,7 +65,7 @@ programs may use libs using the provided STD library, probably with some sort of
 
 ## programs
 
-programs are js files located in /bin/, /sbin/, /lib/ or /slib/ and are executed by the [manager](#manager), [nyash](#nyash) or other programs
+programs are js files located in /bin/, /sbin/ or /lib/ and are executed by the [manager](#manager), [nyash](#nyash) or other programs
 
 they consist of a default exported function that is provided with the exit function, TTY, std lib and optionally the ENV and argv in the arguments
 
@@ -93,8 +93,6 @@ the file system is structured almost identically to linux:
 │  └─ <system programs>
 ├─ lib/
 │  └─ <libraries>
-├─ slib/
-│  └─ <system libraries>
 ├─ etc/
 │  └─ <configuration files>
 ├─ dev/
