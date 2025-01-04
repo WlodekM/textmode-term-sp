@@ -12,7 +12,7 @@ A terminal thingy for my webbed site
 
 install the required packages with your package manager of choice
 
-eg. `yarn instll` or `pnpm install` or `npm install`
+eg. `yarn install` or `pnpm install` or `npm install`
 
 ## step 3. run snowpack
 
