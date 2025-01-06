@@ -89,7 +89,7 @@ export default class System {
                         index = 2;
                         break;
                     default:
-                        return "Invalid user level. Please use 'u' for user, 'g' for group, or 'o' for others.";
+                        throw "Invalid user level. Please use 'u' for user, 'g' for group, or 'o' for others.";
                 }
 
                 // Get the numeric permission value for the selected user level

@@ -56,5 +56,35 @@ export default function std2(stdio: { stdout: WritableStreamDefaultWriter, stdin
             stdio.stdin.on('data', onData)
         })
     }
-    return { printf, err, size, prompt }
+    function parseArgs(argv: string[]): { flags: { [key: string]: boolean | string }, others: string[] } {
+        const flags: { [key: string]: boolean | string } = {};
+        const others: string[] = [];
+    
+        let i = 0;
+        while (i < argv.length) {
+            const arg = argv[i];
+    
+            // Check for flags like -a or --foo
+            if (arg.startsWith('--')) {
+                const [flag, value] = arg.split('=');
+                flags[flag.substring(2)] = value || true;
+            } else if (arg.startsWith('-') && arg.length > 1) {
+                const flag = arg[1];
+                if (argv[i + 1] && !argv[i + 1].startsWith('-')) {
+                    flags[flag] = argv[i + 1];
+                    i++; // Skip the next value since it's the flag's value
+                } else {
+                    flags[flag] = true;
+                }
+            } else {
+                others.push(arg); // Everything else goes to others
+            }
+    
+            i++;
+        }
+    
+        return { flags, others };
+    }
+    
+    return { printf, err, size, prompt, parseArgs }
 }
