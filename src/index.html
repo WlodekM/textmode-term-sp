@@ -28,15 +28,26 @@
             import NYA from './term/nya.ts';
             import xterm from "@xterm/xterm";
             import './textmode.less';
+            let process = window.process = {
+                platform: 'Linux',
+                env: {},
+            }
             const terminal = window.terminal = new Terminal({convertEol: true});
             // mak terminal fit
             const fitAddon = new FitAddon.FitAddon();
             // uh terminal now displays yippee
             terminal.open(document.getElementById('terminal'));
             try {
+                let term;
+                process = window.process = {
+                    ...process,
+                    getuid: () => term?.user.uid,
+                    getgid: () => term?.user.gid,
+                    cwd: () => term?.user.home,
+                }
                 const system = await mksys(localStorage.getItem('fs'));
                 console.log(system)
-                const term = window.term = new NYA(system, 2, terminal);
+                term = window.term = new NYA(system, 2, terminal);
                 const std = term.system.libs.std;
                 fitAddon.fit();  // resize terminale
                 document.getElementById('dev').onclick = () => {
