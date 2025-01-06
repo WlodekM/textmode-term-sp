@@ -1,5 +1,5 @@
-import type EventEmitter from "eventemitter3";
-import type NYAterm from "../term/nya";
+import type { EventEmitter } from "eventemitter3";
+import type NYAterm from "../term/nya.ts";
 
 function boilerplate (
     this: NYAterm,
