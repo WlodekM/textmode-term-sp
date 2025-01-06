@@ -10,7 +10,8 @@ const commands = [
     'mkdir',
     'touch',
     'game',
-    'figlet'
+    'figlet',
+    'dev'
 ]
 
 export default commands
