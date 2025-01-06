@@ -1,9 +1,12 @@
+// deno-lint-ignore-file no-explicit-any
 import { memfs, IFs, vol } from 'memfs';
-//@ts-ignore
+import type { Stats } from 'node:fs'
+//@ts-ignore: when deno is disabled it cant find this module
 import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
 import * as std from "../lib/std.js"
 import std2 from "../lib/std2.ts"
 import cfonts from 'cfonts'
+import type { Libs } from './nya.ts';
 
 export type User = {
     username: string,
@@ -33,7 +36,13 @@ interface dirMetadata extends metadata {
     children: Metadata[]
 }
 
-type Metadata = fileMetadata | dirMetadata
+interface symlinkMetadata extends metadata {
+    type: 'symlink',
+    target: string,
+    lType: 'file' | 'directory'
+}
+
+type Metadata = fileMetadata | dirMetadata | symlinkMetadata
 
 type Volume = typeof vol
 
@@ -45,13 +54,13 @@ export default class System {
     };
     fs: IFs;
     users: Map<number, User> = new Map<number, User>();
-    libs = {
+    libs: Libs = {
         path,
         std,
         std2: std2,
         cfonts,
         perms: {
-            getPerm(permissionNumber, userLevel) {
+            getPerm(permissionNumber: number, userLevel: 'u' | 'g' | 'o') {
                 // Ensure the permission number is within valid range (0 to 777)
                 if (permissionNumber < 0 || permissionNumber > 777) {
                     return "Invalid permission number. It must be between 000 and 777.";
@@ -101,11 +110,11 @@ export default class System {
                 return permissionsString;
             },
 
-            getPermStat(stat, user) {
+            getPermStat(stat: Stats, user: User) {
                 return this.getPermStatLevel(stat, user)[0]
             },
 
-            getPermStatLevel(stat, user) {
+            getPermStatLevel(stat: Stats, user: User) {
                 const mode = parseInt((stat.mode & 0o777).toString(8).padStart(3, '0'), 10)
                 const perm = user.uid == stat.uid || user.uid == 0 ? 'u' : user.gid == stat.gid ? 'g' : 'o';
                 return [this.getPerm(mode, perm), perm]
@@ -115,8 +124,9 @@ export default class System {
     
     getFSjson(path = '/') {
         const vol = this.memfs.vol;
-        const stats = vol.statSync(path); // Get stats for the current path
+        const stats = vol.lstatSync(path); // Get stats for the current path
         const isDirectory = stats.isDirectory();
+        const isSymlink = stats.isSymbolicLink();
 
         const metadata: any = {
             path,
@@ -125,10 +135,13 @@ export default class System {
                 uid: stats.uid, // Requires chown to set uid
                 gid: stats.gid, // Requires chown to set gid
             },
-            type: isDirectory ? 'directory' : 'file',
+            type: isSymlink ? 'symlink' : isDirectory ? 'directory' : 'file',
         };
 
-        if (isDirectory) {
+        if (isSymlink) {
+            metadata.target = vol.readlinkSync(path)
+            metadata.lType = isDirectory ? 'directory' : 'file'
+        } else if (isDirectory) {
             console.log(vol.readdirSync(path))
             metadata.children = vol.readdirSync(path).map((name) =>
                 this.getFSjson(`${path.endsWith('/') ? path : path + '/'}${name}`)
@@ -141,7 +154,7 @@ export default class System {
     }
 
     setFSjson(fsJson: Metadata, vol: Volume): Volume {
-        const createEntry = (entry: Metadata, currentPath: string = '/'): void => {
+        const createEntry = (entry: Metadata, _currentPath: string = '/'): void => {
             const fullPath = entry.path.replace(/\/+/g, '/');
 
             console.log(fullPath, entry)
@@ -160,6 +173,17 @@ export default class System {
             } else if (entry.type === 'file') {
                 // Create file with content and set its mode
                 vol.writeFileSync(fullPath, entry.content || '', { mode: entry.mode });
+            } else if (entry.type === 'symlink') {
+                try {
+                    let paf = entry.lType == 'directory' ? this.libs.path.dirname(entry.target.replace(/([^\/])$/g, '$1/')) : entry.target.replace(/([^\/])$/g, '$1/')
+                    console.debug('recursively making', entry.target.replace(/([^\/])$/g, '$1/'), paf)
+                    vol.mkdirSync(paf, {recursive: true})
+                    const stat = vol.statSync(entry.target)
+                    console.debug('stat:', stat, stat.isDirectory())
+                } catch (e) {console.error('err while recursively mkdir', e)}
+                if (entry.lType == 'file' && !vol.existsSync(entry.target))
+                    vol.writeFileSync(entry.target, '');
+                vol.symlinkSync(entry.target, fullPath, entry.lType == 'directory' ? 'dir' : 'file')
             }
 
             // Set ownership if specified

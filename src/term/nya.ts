@@ -1,4 +1,5 @@
-import EventEmitter from "eventemitter3";
+// deno-lint-ignore-file no-explicit-any no-this-alias
+import { EventEmitter } from "eventemitter3";
 import type System from "./main.ts";
 import type { User } from './main.ts'
 import type { Terminal } from "@xterm/xterm"
@@ -25,7 +26,7 @@ type Program = {
     }
 }
 
-interface Libs {
+export interface Libs {
     path: typeof path,
     std: typeof std,
     std2: typeof std2,
@@ -75,7 +76,7 @@ export default class NYAterm {
         let ps1 = this.env.get("PS1") as string;
         ps1 = ps1.replaceAll('\\u', this.user.username)
         ps1 = ps1.replaceAll('\\h', this.system.hostname);
-        let shortCwdSplit = this.pwd.replaceAll(this.user.home, '~').split('/')
+        const shortCwdSplit = this.pwd.replaceAll(this.user.home, '~').split('/')
         ps1 = ps1.replaceAll('\\d', shortCwdSplit[shortCwdSplit.length - 1] || '/')
         ps1 = ps1.replaceAll('\\p', this.pwd.replaceAll(this.user.home, '~'));
         ps1 = ps1.replaceAll('\\$', this.uid == 0 ? '#' : '$');
@@ -101,10 +102,10 @@ export default class NYAterm {
             return notfound.call(this)
         }
 
-        let cmdTxt = this.system.fs.readFileSync(command).toString();
-        let cmdUri = 'data:text/javascript;base64,' + btoa(cmdTxt);
+        const cmdTxt = this.system.fs.readFileSync(command).toString();
+        const cmdUri = 'data:text/javascript;base64,' + btoa(cmdTxt);
         const impCmd = (await import(cmdUri)).default;
-        const foundCommandFunc = typeof impCmd == 'function' ? impCmd : (function () { this.events.emit('data', `nyash: command not found: ${command}`) })
+        const foundCommandFunc = typeof impCmd == 'function' ? impCmd : (function (this: NYAterm) { this.events.emit('data', `nyash: command not found: ${command}`) })
 
         let sendSignal = (_: any) => { };
         const signalStream: ReadableStream<string> = new ReadableStream<string>({
@@ -149,7 +150,7 @@ export default class NYAterm {
         const term = this;
 
         const ingoing_signals = new WritableStream<number>({
-            async write(exit_code) {
+            async write(_exitCode) {
                 stdin_ev.removeAllListeners();
                 await signalStream.cancel();
                 program.stdout.writer.releaseLock();
@@ -181,7 +182,7 @@ export default class NYAterm {
             exit(1)
         }
     }
-    async write(text: string) {
+    write(text: string) {
         if (this.currentProgram !== null) {
             this.currentProgram.stdin.write(text);
             return;
