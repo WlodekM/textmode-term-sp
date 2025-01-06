@@ -1,7 +1,8 @@
 import type { EventEmitter } from "eventemitter3";
 import type NYAterm from "../term/nya.ts";
 
-function boilerplate (
+//CHANGEME - change the function name to the command name, doesnt matter that much
+export default function boilerplate (
     this: NYAterm,
     exit: (code: number) => void,
     argv: string[],
@@ -9,6 +10,7 @@ function boilerplate (
     stdin: EventEmitter,
     signal: ReadableStreamDefaultReader<string>
 ) {
+    // change the 'boilerplate' to your command's name for err messages
     const { printf, err } = this.libs.std2({ stdout, stdin }, exit, 'boilerplate', this);
     const path = this.libs.path;
     const fs = this.system.fs
