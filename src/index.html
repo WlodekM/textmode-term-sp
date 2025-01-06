@@ -28,65 +28,70 @@
             import NYA from './term/nya.ts';
             import xterm from "@xterm/xterm";
             import './textmode.less';
-            const system = await mksys(localStorage.getItem('fs'));
-            console.log(system)
             const terminal = window.terminal = new Terminal({convertEol: true});
-            const term = window.term = new NYA(system, 2, terminal);
-            const std = term.system.libs.std;
-            document.getElementById('dev').onclick = () => {
-                let r = confirm('reset FS?');
-                if(r) {
-                    localStorage.clear();
-                    window.onbeforeunload = () => {};
-                    document.location.reload()
-                }
-            }
-            // mak terminal
+            // mak terminal fit
             const fitAddon = new FitAddon.FitAddon();
-            window.onresize = function(event) {
-                fitAddon.fit();
-            };
-            term.events.on('data', d => terminal.write(d))
-            terminal.loadAddon(fitAddon);
-            
-            window.onbeforeunload = function (e) {
-                if (document.location.search == '?ns') return;
-                localStorage.setItem('fs', JSON.stringify(term.system.getFSjson()))
-            };
-
-            if (localStorage.getItem('fs') !== null) {
-                console.log('can haz fs!', localStorage.getItem('fs'))
-            }
-        
             // uh terminal now displays yippee
             terminal.open(document.getElementById('terminal'));
-            fitAddon.fit();  // resize terminale
-        
-            std.printf(`  ,-.       _,---._ __  / \\\r
- /  )    .-'       \`./ /   \\\r
-(  (   ,'            \`/    /|\r
- \\  \`-"             \\'\\   / |\r
-  \`.              ,  \\ \\ /  |\r
-   /\`.          ,'-\`----Y   |\r
-  (            ;        |   '\r
-  |  ,-.    ,-'         |  /\r
-  |  | (   |        hjw | /\r
-  )  |  \\  \`.___________|/\r
-  \`--'   \`--'\r
+            try {
+                const system = await mksys(localStorage.getItem('fs'));
+                console.log(system)
+                const term = window.term = new NYA(system, 2, terminal);
+                const std = term.system.libs.std;
+                fitAddon.fit();  // resize terminale
+                document.getElementById('dev').onclick = () => {
+                    let r = confirm('reset FS?');
+                    if(r) {
+                        localStorage.clear();
+                        window.onbeforeunload = () => {};
+                        document.location.reload()
+                    }
+                }
+                window.onresize = function(event) {
+                    fitAddon.fit();
+                };
+                term.events.on('data', d => terminal.write(d))
+                terminal.loadAddon(fitAddon);
+                
+                window.onbeforeunload = function (e) {
+                    if (document.location.search == '?ns') return;
+                    localStorage.setItem('fs', JSON.stringify(term.system.getFSjson()))
+                };
 
-welcome.`)
-            term.prompt();
-            terminal.write('figlet textmode');
-            std.printf(`\r
-\r _            _                       _
-\r| |_ _____  _| |_ _ __ ___   ___   __| | ___
-\r| __/ _ \\ \\/ / __| '_ \` _ \\ / _ \\ / _\` |/ _ \\
-\r| ||  __/>  <| |_| | | | | | (_) | (_| |  __/
-\r \\__\\___/_/\\_\\\\__|_| |_| |_|\\___/ \\__,_|\\___|`)
-            term.prompt();
-        
-            // Handle user input
-            terminal.onData(async e => await term.write(e));
+                if (localStorage.getItem('fs') !== null) {
+                    console.log('can haz fs!', localStorage.getItem('fs'))
+                }
+            
+                std.printf(`  ,-.       _,---._ __  / \\\r
+    /  )    .-'       \`./ /   \\\r
+    (  (   ,'            \`/    /|\r
+    \\  \`-"             \\'\\   / |\r
+    \`.              ,  \\ \\ /  |\r
+    /\`.          ,'-\`----Y   |\r
+    (            ;        |   '\r
+    |  ,-.    ,-'         |  /\r
+    |  | (   |        hjw | /\r
+    )  |  \\  \`.___________|/\r
+    \`--'   \`--'\r
+
+    welcome.`)
+                term.prompt();
+                terminal.write('figlet textmode');
+                std.printf(`\r
+    \r _            _                       _
+    \r| |_ _____  _| |_ _ __ ___   ___   __| | ___
+    \r| __/ _ \\ \\/ / __| '_ \` _ \\ / _ \\ / _\` |/ _ \\
+    \r| ||  __/>  <| |_| | | | | | (_) | (_| |  __/
+    \r \\__\\___/_/\\_\\\\__|_| |_| |_|\\___/ \\__,_|\\___|`)
+                term.prompt();
+            
+                // Handle user input
+                terminal.onData(async e => await term.write(e));
+                fitAddon.fit();  // resize terminale
+            } catch (error) {
+                console.error(error);
+                terminal.write('Uh oh!\n\rIt looks like textmode has crashed. Check the console for more info')
+            }
         </script>
     </body>
 </html>
