@@ -14,6 +14,6 @@ export default async function makeFS(this: System) {
     for (const cmd of commands) {
         const command = (await import(`../commands/${cmd}.js`)).default;
         this.fs.writeFileSync(`/usr/bin/${cmd}.js`, 'export default ' + command.toString())
-        this.fs.chmodSync(`/usr/bin/${cmd}.js`, 775)
+        this.fs.chmodSync(`/usr/bin/${cmd}.js`, parseInt('775', 8))
     }
 }

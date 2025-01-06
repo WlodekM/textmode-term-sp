@@ -9,7 +9,7 @@ export default function (
     stdin: EventEmitter,
     signal: ReadableStreamDefaultReader<string>
 ) {
-    const { printf, err } = this.libs.std2({ stdout }, exit, 'boilerplate');
+    const { printf, err } = this.libs.std2({ stdout, stdin }, exit, 'boilerplate');
     const path = this.libs.path;
     const fs = this.system.fs
 
@@ -27,7 +27,7 @@ export default function (
     // const oldFilePerms = parseInt((stat.mode & 0o777).toString(8).padStart(3, '0'), 10)
     // const newFilePerms = modifyFilePermissions(oldFilePerms, mode);
 
-    fs.chmodSync(file, mode);
+    fs.chmodSync(file, parseInt(mode, 8));
 
     exit(0) // 0 for success
 }
