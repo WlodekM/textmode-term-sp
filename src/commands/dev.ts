@@ -22,7 +22,7 @@ export default async function dev (
     switch (mode) {
         case 'clear':
             const confirm: string = await stdPrompt('Are you sure you want to clear the FS? [y/N]:');
-            if (!['y', 'yes'].includes(confirm))
+            if (!['y', 'yes'].includes(confirm)) return;
             localStorage.clear();
             window.onbeforeunload = () => {};
             document.location.reload()
@@ -55,7 +55,7 @@ export default async function dev (
             if(Number.isNaN(user) || !this.system.users.has(user))
                 return printf('Unknown user '+ user);
             this.uid = user
-            printf('User changed to'+user)
+            printf('User changed to '+user)
             break;
         
         case 'tree':
