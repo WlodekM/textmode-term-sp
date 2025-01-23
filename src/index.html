@@ -24,13 +24,16 @@
             <a href="https://cd5k.net/tau/">&tau;</a>
         </div>
         <script>
+            window.rootMode = false
             globalThis.global = globalThis
             globalThis.process = {
-                env: {}
+                env: {},
             }
             let process = window.process = {
                 platform: 'Linux',
                 env: {},
+                getuid: () => window.rootMode ? 0 : window.term?.user.uid,
+                getgid: () => window.rootMode ? 0 : window.term?.user.gid,
             }
         </script>
         <script type="module">
@@ -54,7 +57,9 @@
                         return Object.fromEntries([...term.env.entries()])
                     }
                 }
+                window.rootMode = true;
                 const system = await mksys(localStorage.getItem('fs'));
+                window.rootMode = false;
                 console.log(system)
                 term = window.term = new NYA(system, 2, terminal);
                 const std = term.system.libs.std;
@@ -75,7 +80,9 @@
                 
                 window.onbeforeunload = function (e) {
                     if (document.location.search == '?ns') return;
-                    localStorage.setItem('fs', JSON.stringify(term.system.getFSjson()))
+                    window.rootMode = true;
+                    localStorage.setItem('fs', JSON.stringify(term.system.getFSjson()));
+                    window.rootMode = false;
                 };
 
                 if (localStorage.getItem('fs') !== null) {
