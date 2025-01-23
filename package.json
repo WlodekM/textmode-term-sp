@@ -4,6 +4,7 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "snowpack build --polyfill-node",
         "dev": "snowpack dev --polyfill-node",
         "reinstall": "rm -rf node_modules *lock* && yarn",
         "why-err": "yarn why set-function-length",
