@@ -7,7 +7,6 @@ import type * as std from '../lib/std.js'
 import type std2 from '../lib/std2.ts'
 import type { Stats } from 'node:fs'
 import type { IFs } from "memfs";
-import type path from 'node:path/posix'
 import type cfonts from 'cfonts'
 
 type Program = {
@@ -27,7 +26,7 @@ type Program = {
 }
 
 export interface Libs {
-    path: typeof path,
+    path: typeof import('https://esm.sh/jsr/@std/path@1.0.8/posix'),
     std: typeof std,
     std2: typeof std2,
     cfonts: typeof cfonts,

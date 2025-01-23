@@ -2,7 +2,7 @@
 import { memfs, IFs, vol } from 'memfs';
 import type { Stats } from 'node:fs'
 //@ts-ignore: when deno is disabled it cant find this module
-import * as path from 'https://esm.sh/jsr/@std/path@1.0.8';
+import * as path from 'https://esm.sh/jsr/@std/path@1.0.8/posix';
 import * as std from "../lib/std.js"
 import std2 from "../lib/std2.ts"
 import cfonts from 'cfonts'

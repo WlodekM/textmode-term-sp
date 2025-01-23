@@ -23,15 +23,21 @@
             <a class="red" style="cursor: pointer;" id="dev">DEV</a>
             <a href="https://cd5k.net/tau/">&tau;</a>
         </div>
+        <script>
+            globalThis.global = globalThis
+            globalThis.process = {
+                env: {}
+            }
+            let process = window.process = {
+                platform: 'Linux',
+                env: {},
+            }
+        </script>
         <script type="module">
             import mksys from "./term/mksys.ts"
             import NYA from './term/nya.ts';
             import xterm from "@xterm/xterm";
             import './textmode.less';
-            let process = window.process = {
-                platform: 'Linux',
-                env: {},
-            }
             const terminal = window.terminal = new Terminal({convertEol: true});
             // mak terminal fit
             const fitAddon = new FitAddon.FitAddon();
@@ -44,6 +50,9 @@
                     getuid: () => term?.user.uid,
                     getgid: () => term?.user.gid,
                     cwd: () => term?.user.home,
+                    get env() {
+                        return Object.fromEntries([...term.env.entries()])
+                    }
                 }
                 const system = await mksys(localStorage.getItem('fs'));
                 console.log(system)
