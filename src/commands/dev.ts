@@ -63,7 +63,7 @@ export default async function dev (
             break;
     
         default:
-            printf('unknown subcommand')
+            err('unknown subcommand')
             break;
     }
 
