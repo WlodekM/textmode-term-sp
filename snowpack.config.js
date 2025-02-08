@@ -6,6 +6,7 @@ console.log(fs.readdirSync('./node_modules').filter(a => a[0] == 'p'))
 
 if (fs.existsSync('./node_modules')) {
   if (fs.existsSync('./node_modules/process')) {
+    console.log('overriding process package json')
     fs.writeFileSync('./node_modules/process/package.json', `{
   "author": "Roman Shtylman <shtylman@gmail.com>",
   "name": "process",
