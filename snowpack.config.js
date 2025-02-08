@@ -2,6 +2,8 @@
 // See all supported options: https://www.snowpack.dev/reference/configuration
 const fs = require('fs');
 
+console.log(fs.readdirSync('.'))
+
 if (fs.existsSync('./node_modules')) {
   if (fs.existsSync('./node_modules/process')) {
     fs.writeFileSync('./node_modules/process/package.json', `{
