@@ -2,7 +2,7 @@
 // See all supported options: https://www.snowpack.dev/reference/configuration
 const fs = require('fs');
 
-console.log(fs.readdirSync('./node_modules'))
+console.log(fs.readdirSync('./node_modules').filter(a => a[0] == 'p'))
 
 if (fs.existsSync('./node_modules')) {
   if (fs.existsSync('./node_modules/process')) {
